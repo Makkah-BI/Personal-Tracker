@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>ExpenseTracker Pro | Personal Finance Manager</title>
+    <link rel="stylesheet" href="style.css" />
+    <!-- Font Awesome 6 (free icons) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="app-container">
+      <div class="header">
+        <h1>ExpenseTracker Pro</h1>
+        <div class="sub">Track, analyze & control your finances</div>
+      </div>
+
+      <!-- ADD / EDIT EXPENSE CARD -->
+      <div class="card">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+          "
+        >
+          <h3>
+            <span id="formTitle">Add New Expense</span>
+          </h3>
+          <button
+            id="cancelEditBtn"
+            class="btn btn-outline"
+            style="display: none"
+          >
+            <i class="fas fa-times"></i> Cancel
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="input-group">
+            <label><i class="fas fa-tag"></i> Description</label>
+            <input
+              type="text"
+              id="descInput"
+              placeholder="e.g., Groceries, Coffee, Rent"
+              autocomplete="off"
+            />
+          </div>
+          <div class="input-group">
+            <label><i class="fas fa-dollar-sign"></i> Amount ($)</label>
+            <input
+              type="number"
+              id="amountInput"
+              placeholder="0.00"
+              step="0.01"
+              min="0.01"
+            />
+          </div>
+          <div class="input-group">
+            <label><i class="fas fa-list"></i> Category</label>
+            <select id="categorySelect">
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Bills">Bills</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Health">Health</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label><i class="fas fa-calendar-alt"></i> Date</label>
+            <input type="date" id="dateInput" />
+          </div>
+          <div class="input-group">
+            <button id="submitExpenseBtn" class="btn btn-primary">
+              <i class="fas fa-plus-circle"></i> Add Expense
+            </button>
+          </div>
+        </div>
+        <div
+          id="formError"
+          style="color: #e11d48; font-size: 0.75rem; margin-top: 12px"
+        ></div>
+      </div>
+
+      <!-- FILTER & STATS SECTION -->
+      <div class="card">
+        <div class="filter-bar">
+          <div class="filter-group">
+            <div class="input-group" style="min-width: 130px">
+              <label>Category Filter</label>
+              <select id="filterCategory">
+                <option value="ALL">All Categories</option>
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Bills">Bills</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Health">Health</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>From Date</label>
+              <input type="date" id="filterDateFrom" />
+            </div>
+            <div class="input-group">
+              <label>To Date</label>
+              <input type="date" id="filterDateTo" />
+            </div>
+            <button id="resetFiltersBtn" class="btn btn-outline">
+              <i class="fas fa-eraser"></i> Reset Filters
+            </button>
+          </div>
+          <div>
+            <button id="exportCSVBtn" class="btn btn-outline">
+              <i class="fas fa-download"></i> Export CSV
+            </button>
+            <button
+              id="clearAllBtn"
+              class="btn btn-danger"
+              style="margin-left: 6px"
+            >
+              <i class="fas fa-trash-alt"></i> Delete All
+            </button>
+          </div>
+        </div>
+
+        <!-- STATISTICS CARDS -->
+        <div class="summary-stats" style="margin-top: 20px">
+          <div class="stat-card">
+            <div class="stat-label">TOTAL EXPENSES (ALL)</div>
+            <div class="stat-value" id="totalAllExpenses">$0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">FILTERED TOTAL</div>
+            <div class="stat-value" id="filteredTotal">$0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">TRANSACTIONS</div>
+            <div class="stat-value small" id="filteredCount">0</div>
+          </div>
+        </div>
+
+        <!-- CATEGORY BREAKDOWN CHART (Canvas) -->
+        <div class="category-chart">
+          <h4 style="margin-bottom: 12px">
+            <i class="fas fa-chart-simple"></i> Spending by Category (overall)
+          </h4>
+          <canvas
+            id="categoryChartCanvas"
+            width="600"
+            height="220"
+            style="max-width: 100%; height: auto; background: #fff"
+          ></canvas>
+        </div>
+      </div>
+
+      <!-- EXPENSES LIST TABLE -->
+      <div class="card">
+        <h3 style="margin-bottom: 1rem">
+          <i class="fas fa-receipt"></i> Transaction History
+        </h3>
+        <div class="expense-table">
+          <table id="expenseTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th style="width: 80px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="expenseTableBody">
+              <tr class="empty-row">
+                <td colspan="5">No expenses yet. Add your first expense!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <footer><i> Data saved locally </i></footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
